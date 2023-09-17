@@ -32,15 +32,16 @@ class WatchPartyPlayer {
       width: "480",
       videoId: "I5NHjU0Tj7c",
       events: {
-        onReady: () => this.update(),
+        onReady: (ev) => {
+          this.update(ev.target);
+          tree.events.on("afterBatch", () => this.update(this.player));
+        },
         onStateChange: (ev) => this.onPlayerStateChange(ev),
       },
     });
-
-    tree.events.on("afterBatch", () => this.update());
   }
 
-  private update(): void {
+  private update(player: YT.Player): void {
     if (arePlayerStatesEqual(this.state.playerState, this.playerStateCache)) {
       return;
     }
@@ -48,10 +49,10 @@ class WatchPartyPlayer {
     if (this.state.playerState !== undefined) {
       const elapsed = Date.now() - this.state.playerState.timeStarted;
       const time = elapsed + this.state.playerState.videoProgress;
-      this.player.playVideo();
-      this.player.seekTo(time / 1000, true);
+      player.seekTo(time / 1000, true);
+      player.playVideo();
     } else {
-      this.player.pauseVideo();
+      player.pauseVideo();
     }
     this.playerStateCache = this.state.playerState;
   }
