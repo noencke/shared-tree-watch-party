@@ -11,6 +11,7 @@ import {
 import {
   AzureClient,
   AzureLocalConnectionConfig,
+  AzureRemoteConnectionConfig,
 } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-runtime-utils";
 import { ContainerSchema, IFluidContainer } from "fluid-framework";
@@ -37,14 +38,23 @@ const localConfig: AzureLocalConnectionConfig = {
   endpoint: "http://localhost:7070",
 };
 
+function remoteConfig(key: string): AzureRemoteConnectionConfig {
+  return {
+    tenantId: "68dd0a5c-960b-45b0-ae9a-c37059f92754",
+    tokenProvider: new InsecureTokenProvider(key, user),
+    type: "remote",
+    endpoint: "https://us.fluidrelay.azure.com",
+  };
+}
+
 export default async function connect(): Promise<{
   container: IFluidContainer;
   tree: ISharedTree;
 }> {
   if (connectedState === undefined) {
-    const client = new AzureClient({
-      connection: localConfig,
-    });
+    const key = import.meta.env.VITE_KEY;
+    const connection = key !== undefined ? remoteConfig(key) : localConfig;
+    const client = new AzureClient({ connection });
     let container: IFluidContainer;
     let tree: ISharedTree;
     if (location.hash.length === 0) {
