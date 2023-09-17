@@ -8,7 +8,10 @@ import {
   ISharedTree,
   SharedTreeFactory,
 } from "@fluid-experimental/tree2";
-import { AzureClient } from "@fluidframework/azure-client";
+import {
+  AzureClient,
+  AzureLocalConnectionConfig,
+} from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-runtime-utils";
 import { ContainerSchema, IFluidContainer } from "fluid-framework";
 import { schema } from "./schema";
@@ -28,14 +31,10 @@ let connectedState:
   | { container: IFluidContainer; tree: ISharedTree }
   | undefined;
 
-const localConfig = {
+const localConfig: AzureLocalConnectionConfig = {
   tokenProvider: new InsecureTokenProvider("", user),
   type: "local",
   endpoint: "http://localhost:7070",
-} as const;
-
-const clientProps = {
-  connection: localConfig,
 };
 
 export default async function connect(): Promise<{
@@ -43,7 +42,9 @@ export default async function connect(): Promise<{
   tree: ISharedTree;
 }> {
   if (connectedState === undefined) {
-    const client = new AzureClient(clientProps);
+    const client = new AzureClient({
+      connection: localConfig,
+    });
     let container: IFluidContainer;
     let tree: ISharedTree;
     if (location.hash.length === 0) {

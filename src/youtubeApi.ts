@@ -3,11 +3,15 @@
  * Licensed under the MIT License.
  */
 
-let resolveYoutubeAPIPromise: () => void;
+// When the YouTube API finishes loading, it will call a special `onYouTubeIframeAPIReady` function in the global scope.
 const youtubeAPIPromise = new Promise<void>((resolve) => {
-  resolveYoutubeAPIPromise = resolve;
+  (window as any).onYouTubeIframeAPIReady = () => resolve();
 });
 
-(window as any).onYouTubeIframeAPIReady = () => resolveYoutubeAPIPromise();
+// Load the YouTube API by adding a script tag to the document that points to the YouTube API URL.
+const youtubeApiScript = document.createElement("script");
+youtubeApiScript.src = "https://www.youtube.com/iframe_api";
+document.body.appendChild(youtubeApiScript);
 
+/** This promise will complete when the global YouTube API has finished loading. */
 export default youtubeAPIPromise;

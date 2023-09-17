@@ -21,9 +21,10 @@ export const appSchema = builder.struct("app", {
   playerState: SchemaBuilder.fieldOptional(playerStateSchema),
 });
 
-export const rootField = SchemaBuilder.fieldOptional(appSchema);
-export const schema = builder.intoDocumentSchema(rootField);
-export type Root = (typeof schema)["root"];
+export const schema = builder.intoDocumentSchema(
+  SchemaBuilder.fieldOptional(appSchema)
+);
+
 export type AppState = SchemaAware.TypedNode<typeof appSchema>;
 export type PlayerState = SchemaAware.TypedNode<typeof playerStateSchema>;
 

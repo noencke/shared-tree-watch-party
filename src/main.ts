@@ -8,12 +8,9 @@ import "./style.css";
 import { AppState, PlayerState, arePlayerStatesEqual } from "./schema";
 import { ISharedTree } from "@fluid-experimental/tree2";
 import youtubeApi from "./youtubeApi";
-import connect from "./container";
+import connect from "./connection";
 
 async function main() {
-  const youtubeApiScript = document.createElement("script");
-  youtubeApiScript.src = "https://www.youtube.com/iframe_api";
-  document.body.appendChild(youtubeApiScript);
   await youtubeApi;
   const { tree } = await connect();
   new WatchPartyPlayer(tree, "player");
